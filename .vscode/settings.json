@@ -8,5 +8,11 @@
         }
     },
     "terminal.integrated.tabs.enabled": true,
-    "terminal.integrated.enablePersistentSessions": false
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.persistentSessionReviveProcess": "never",
+    "terminal.integrated.enableAutoRun": false,
+    "terminal.integrated.shellIntegration.enabled": false,
+    "python.terminal.activateInCurrentTerminal": false,
+    "powershell.enableProfileLoading": false,
+    "powershell.startAutomatically": false
 } 
