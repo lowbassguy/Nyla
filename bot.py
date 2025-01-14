@@ -1,50 +1,40 @@
-import os
 import discord
+import os
+from discord import Intents
 from discord.ext import commands
 from dotenv import load_dotenv
-from flask import Flask
-import threading
 
-# Load environment variables from .env file
-load_dotenv()  # This loads environment variables from a .env file into the environment
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')  # Retrieves the Discord bot token from the environment variables
+# Load environment variables
+load_dotenv()
+TOKEN = os.getenv('BOT_TOKEN')
 
-# Create Flask app
-app = Flask(__name__)  # Initializes a Flask web application
+class NylaBot(commands.Bot):
+    def __init__(self):
+        intents = Intents.all()
+        super().__init__(
+            command_prefix='!',
+            intents=intents
+        )
 
-@app.route('/')  # Defines a route for the root URL
-def home():
-    return 'Bot is running!'  # Returns a simple message when the root URL is accessed
+    async def setup_hook(self):
+        print("Bot is starting up...")
+        await self.tree.sync()
+        print("Commands synced")
 
-# Create a bot instance with all intents enabled
-intents = discord.Intents.all()  # Enables all Discord intents for the bot
-bot = commands.Bot(command_prefix='!', intents=intents)  # Creates a bot instance with a command prefix and intents
+    async def on_ready(self):
+        print(f"Logged in as {self.user} (ID: {self.user.id})")
+        print("------")
+        print("Current Guilds:")
+        for guild in self.guilds:
+            print(f"- {guild.name} (ID: {guild.id})")
 
-# Event: on_ready
-@bot.event
-async def on_ready():
-    # Prints bot's login information and the guilds it is part of
-    print(f'Logged in as {bot.user.name} - {bot.user.id}')
-    print('Guilds the bot is in:')
-    for guild in bot.guilds:
-        print(f'- {guild.name} (id: {guild.id})')
-        print('  Channels:')
-        for channel in guild.channels:
-            print(f'  - {channel.name} (id: {channel.id})')
+    async def on_guild_join(self, guild):
+        print(f"Joined new guild: {guild.name} (ID: {guild.id})")
+        
+    async def on_guild_available(self, guild):
+        print(f"Guild became available: {guild.name} (ID: {guild.id})")
 
-@bot.event
-async def on_guild_join(guild):
-    # Prints a message when the bot joins a new guild
-    print(f'Bot joined guild: {guild.name} (id: {guild.id})')
+bot = NylaBot()
 
-def run_flask():
-    # Runs the Flask app on all available IP addresses on port 5000
-    app.run(host='0.0.0.0', port=5000)
-
-if __name__ == '__main__':
-    # Start Flask in a separate thread
-    flask_thread = threading.Thread(target=run_flask)  # Creates a new thread to run the Flask app
-    flask_thread.start()  # Starts the Flask thread
-    
-    # Run the bot
-    bot.run(TOKEN)  # Starts the Discord bot using the token
+if __name__ == "__main__":
+    bot.run(TOKEN)
